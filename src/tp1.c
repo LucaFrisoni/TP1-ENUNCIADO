@@ -98,7 +98,7 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 			}
 		}
 		if (!existe) {
-			agregar_pokemon(tp3, &otro_tp->pokemones[j]);
+			agregar_pokemon_existente(tp3, &otro_tp->pokemones[j]);
 		}
 	}
 
@@ -128,7 +128,8 @@ tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 		for (size_t j = 0; j < tp_grande->cantidad; j++) {
 			if (tp_pequeno->pokemones[i].id ==
 			    tp_grande->pokemones[j].id) {
-				agregar_pokemon(tp3, &tp_pequeno->pokemones[i]);
+				agregar_pokemon_existente(
+					tp3, &tp_pequeno->pokemones[i]);
 				break;
 			}
 		}
@@ -163,7 +164,7 @@ tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 		}
 
 		if (!encontrado) {
-			agregar_pokemon(tp3, &un_tp->pokemones[i]);
+			agregar_pokemon_existente(tp3, &un_tp->pokemones[i]);
 		}
 	}
 

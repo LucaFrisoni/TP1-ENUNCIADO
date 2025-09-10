@@ -404,16 +404,26 @@ void agregar_pokemon(tp1_t *tp1, struct pokemon *pk)
 	tp1->pokemones = tmp;
 
 	// Copiamos el pokemon al array
-	tp1->pokemones[tp1->cantidad].id = pk->id;
-	tp1->pokemones[tp1->cantidad].nombre = pk->nombre;
-	tp1->pokemones[tp1->cantidad].tipo = pk->tipo;
-	tp1->pokemones[tp1->cantidad].ataque = pk->ataque;
-	tp1->pokemones[tp1->cantidad].defensa = pk->defensa;
-	tp1->pokemones[tp1->cantidad].velocidad = pk->velocidad;
-
+	tp1->pokemones = tmp;
+	tp1->pokemones[tp1->cantidad] = *pk;
 	tp1->cantidad++;
 
 	free(pk);
+}
+
+// Caso: pokemon que ya está en otro tp1
+void agregar_pokemon_existente(tp1_t *tp1, struct pokemon *pk)
+{
+	struct pokemon *tmp = realloc(
+		tp1->pokemones, sizeof(struct pokemon) * (tp1->cantidad + 1));
+	if (!tmp) {
+		printf("Error realloc al agregar pokemon\n");
+		exit(1);
+	}
+
+	tp1->pokemones = tmp;
+	tp1->pokemones[tp1->cantidad] = *pk;
+	tp1->cantidad++;
 }
 // --------------------------------------------------------------------------------------------------------
 const char *tipo_a_string(enum tipo_pokemon tipo)

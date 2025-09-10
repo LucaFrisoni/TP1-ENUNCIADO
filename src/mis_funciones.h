@@ -109,6 +109,17 @@ void escribiendo_linea(tp1_t *tp1, FILE *archivo);
 bool parse_pokemon_validations(char *linea);
 
 /**
+ * @brief Verifica si un pokemon ya existe en el tp1 para evitar duplicados.
+ *
+ * Compara el id de los pokemones almacenados con el del pokemon pasado por parámetro.
+ * Si encuentra un duplicado, libera la memoria asociada a pk (nombre y struct).
+ *
+ * @param tp1 Puntero a la estructura que contiene los pokemones.
+ * @param pk  Puntero al pokemon que se desea verificar.
+ * @return true si el pokemon ya existe (duplicado), false en caso contrario.
+ */
+bool buscando_duplicados(tp1_t *tp1, struct pokemon *pk);
+/**
  * @brief Asigna un valor de un campo leído a un pokemon.
  * @param p Puntero al pokemon a modificar.
  * @param campo Número del campo (0=id, 1=nombre, 2=tipo, 3=ataque, 4=defensa, 5=velocidad).
@@ -129,6 +140,13 @@ struct pokemon *parsear_pokemon(char *linea);
  * @param pk Puntero al pokemon a agregar.
  */
 void agregar_pokemon(tp1_t *tp1, struct pokemon *pk);
+
+/**
+ * @brief Agrega un pokemon existente (ya perteneciente a otro tp1) al array.
+ * @param tp1 Puntero a la estructura que contiene los pokemones.
+ * @param pk  Puntero al pokemon existente que se desea copiar al array.
+ */
+void agregar_pokemon_existente(tp1_t *tp1, struct pokemon *pk);
 
 // --------------------------------------------------------------------------------------------------------
 // Utilidades
