@@ -227,12 +227,8 @@ int ejecutando_funciones(int argc, char *argv[])
 			free(tp_resultado);
 		}
 
-		for (size_t i = 0; i < tp1->cantidad; i++) {
-			free(tp1->pokemones[i].nombre);
-		}
-		free(tp1->pokemones);
-		free(tp1);
+		tp1_destruir(tp1);
 	}
 
 	return 0;
-};
+}

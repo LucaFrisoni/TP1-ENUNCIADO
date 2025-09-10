@@ -205,8 +205,8 @@ char *leer_linea(FILE *archivo, size_t *capacidad)
 		"Error asignando memoria para buffer dinámico -leer linea-");
 
 	while (leyendo) {
-		if (fgets(&buffer[longitud], *capacidad - longitud, archivo) ==
-		    NULL) {
+		if (fgets(&buffer[longitud], (int)(*capacidad - longitud),
+			  archivo) == NULL) {
 			if (longitud == 0) { //Final del archivo
 				free(buffer);
 				return NULL;

@@ -39,7 +39,7 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 
 	fclose(archivo);
 	return tp1;
-};
+}
 // --------------------------------------------------------------------------------------------------------
 size_t tp1_cantidad(tp1_t *tp1)
 {
@@ -48,7 +48,7 @@ size_t tp1_cantidad(tp1_t *tp1)
 	} else {
 		return tp1->cantidad;
 	}
-};
+}
 // --------------------------------------------------------------------------------------------------------
 tp1_t *tp1_guardar_archivo(tp1_t *tp1, const char *nombre)
 {
@@ -64,7 +64,7 @@ tp1_t *tp1_guardar_archivo(tp1_t *tp1, const char *nombre)
 	fclose(archivo);
 
 	return tp1;
-};
+}
 // --------------------------------------------------------------------------------------------------------
 tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 {
@@ -103,7 +103,7 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 	}
 
 	return tp3;
-};
+}
 // --------------------------------------------------------------------------------------------------------
 tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 {
@@ -135,7 +135,7 @@ tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 	}
 
 	return tp3;
-};
+}
 // --------------------------------------------------------------------------------------------------------
 tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 {
@@ -168,7 +168,7 @@ tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 	}
 
 	return tp3;
-};
+}
 // --------------------------------------------------------------------------------------------------------
 struct pokemon *tp1_buscar_nombre(tp1_t *tp, const char *nombre)
 {
@@ -242,4 +242,13 @@ size_t tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *),
 		}
 	}
 	return i;
-};
+}
+// --------------------------------------------------------------------------------------------------------
+void tp1_destruir(tp1_t *tp1)
+{
+	for (size_t i = 0; i < tp1->cantidad; i++) {
+		free(tp1->pokemones[i].nombre);
+	}
+	free(tp1->pokemones);
+	free(tp1);
+}
