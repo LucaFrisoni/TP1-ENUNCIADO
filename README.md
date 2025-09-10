@@ -244,6 +244,13 @@ El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos pue
 
 ---
 
+#### Función de Liberacion de memoria
+
+- **`tp1_destruir`**  
+  Libera toda la memoria asociada al tp1.
+
+---
+
 Estas funciones dependen de las utilidades definidas en `mis_funciones.c`
 
 ---
