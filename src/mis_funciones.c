@@ -254,6 +254,19 @@ bool parse_pokemon_validations(char *linea)
 	}
 }
 
+bool buscando_duplicados(tp1_t *tp1, struct pokemon *pk)
+{
+	for (size_t i = 0; i < tp1->cantidad; i++) {
+		if (tp1->pokemones[i].id == pk->id) {
+			// Es duplicado
+			free(pk->nombre);
+			free(pk);
+			return true;
+		}
+	}
+	return false;
+}
+
 void switch_pokemon(struct pokemon *p, int campo, const char *buffer)
 {
 	switch (campo) {
@@ -378,6 +391,10 @@ struct pokemon *parsear_pokemon(char *linea)
 
 void agregar_pokemon(tp1_t *tp1, struct pokemon *pk)
 {
+	if (buscando_duplicados(tp1, pk)) {
+		return; //si es duplicado
+	}
+
 	struct pokemon *tmp = realloc(
 		tp1->pokemones, sizeof(struct pokemon) * (tp1->cantidad + 1));
 	if (!tmp) {
@@ -387,8 +404,16 @@ void agregar_pokemon(tp1_t *tp1, struct pokemon *pk)
 	tp1->pokemones = tmp;
 
 	// Copiamos el pokemon al array
-	tp1->pokemones[tp1->cantidad] = *pk;
+	tp1->pokemones[tp1->cantidad].id = pk->id;
+	tp1->pokemones[tp1->cantidad].nombre = pk->nombre;
+	tp1->pokemones[tp1->cantidad].tipo = pk->tipo;
+	tp1->pokemones[tp1->cantidad].ataque = pk->ataque;
+	tp1->pokemones[tp1->cantidad].defensa = pk->defensa;
+	tp1->pokemones[tp1->cantidad].velocidad = pk->velocidad;
+
 	tp1->cantidad++;
+
+	free(pk);
 }
 // --------------------------------------------------------------------------------------------------------
 const char *tipo_a_string(enum tipo_pokemon tipo)

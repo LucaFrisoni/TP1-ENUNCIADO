@@ -235,13 +235,15 @@ size_t tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *),
 			    void *extra)
 {
 	size_t i;
+	size_t count = 0;
 	bubbleSort_pokemones_id_asc_optimizado(un_tp);
 	for (i = 0; i < un_tp->cantidad; i++) {
+		count++;
 		if (!f(&un_tp->pokemones[i], extra)) {
 			break;
 		}
 	}
-	return i;
+	return count;
 }
 // --------------------------------------------------------------------------------------------------------
 void tp1_destruir(tp1_t *tp1)

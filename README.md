@@ -193,6 +193,7 @@ Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`)
 - **`agregar_pokemon(tp1_t *tp1, struct pokemon *pk)`** → agrega un Pokémon al vector dinámico de `tp1_t`.
 - **`tipo_a_string(enum tipo_pokemon tipo)`** → convierte el tipo de Pokémon a cadena.
 - **`validando_formato_csv(const char *archivo)`** → valida que el archivo tenga extensión `.csv`..
+- **`buscando_duplicados(tp1_t *tp1, struct pokemon *pk)`** → devuelve true si el pokemon ya se encontraba dentro del array dinamico.
 
 ---
 
