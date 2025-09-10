@@ -66,13 +66,13 @@ tp1_t *tp1_guardar_archivo(tp1_t *tp1, const char *nombre)
 	return tp1;
 };
 // --------------------------------------------------------------------------------------------------------
-tp1_t *tp1_union(tp1_t *un_tp, tp1_t otro_tp)
+tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 {
 	tp1_t *tp3;
 	size_t i, j, k;
 	bool existe;
 
-	if (!un_tp || otro_tp.cantidad == 0 || un_tp->cantidad == 0) {
+	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -88,25 +88,26 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t otro_tp)
 	}
 
 	// Agregamos de otro_tp los que no están
-	for (j = 0; j < otro_tp.cantidad; j++) {
+	for (j = 0; j < otro_tp->cantidad; j++) {
 		existe = false;
 		for (k = 0; k < un_tp->cantidad; k++) {
-			if (un_tp->pokemones[k].id == otro_tp.pokemones[j].id) {
+			if (un_tp->pokemones[k].id ==
+			    otro_tp->pokemones[j].id) {
 				existe = true;
 				break;
 			}
 		}
 		if (!existe) {
-			agregar_pokemon(tp3, &otro_tp.pokemones[j]);
+			agregar_pokemon(tp3, &otro_tp->pokemones[j]);
 		}
 	}
 
 	return tp3;
 };
 // --------------------------------------------------------------------------------------------------------
-tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)
+tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 {
-	if (!un_tp || otro_tp.cantidad == 0 || un_tp->cantidad == 0) {
+	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -117,16 +118,16 @@ tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)
 
 	// Determino cuál es el TP más pequeño para iterar menos
 	tp1_t *tp_pequeno = un_tp;
-	tp1_t tp_grande = otro_tp;
-	if (un_tp->cantidad > otro_tp.cantidad) {
-		tp_pequeno = &otro_tp;
-		tp_grande = *un_tp;
+	tp1_t *tp_grande = otro_tp;
+	if (un_tp->cantidad > otro_tp->cantidad) {
+		tp_pequeno = otro_tp;
+		tp_grande = un_tp;
 	}
 
-		for (size_t i = 0; i < tp_pequeno->cantidad; i++) {
-		for (size_t j = 0; j < tp_grande.cantidad; j++) {
+	for (size_t i = 0; i < tp_pequeno->cantidad; i++) {
+		for (size_t j = 0; j < tp_grande->cantidad; j++) {
 			if (tp_pequeno->pokemones[i].id ==
-			    tp_grande.pokemones[j].id) {
+			    tp_grande->pokemones[j].id) {
 				agregar_pokemon(tp3, &tp_pequeno->pokemones[i]);
 				break;
 			}
@@ -136,11 +137,11 @@ tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)
 	return tp3;
 };
 // --------------------------------------------------------------------------------------------------------
-tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)
+tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 {
 	bool encontrado;
 
-	if (!un_tp || otro_tp.cantidad == 0 || un_tp->cantidad == 0) {
+	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -153,8 +154,9 @@ tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)
 		encontrado = false;
 
 		// Reviso si está en el segundo tp1
-		for (size_t j = 0; j < otro_tp.cantidad; j++) {
-			if (un_tp->pokemones[i].id == otro_tp.pokemones[j].id) {
+		for (size_t j = 0; j < otro_tp->cantidad; j++) {
+			if (un_tp->pokemones[i].id ==
+			    otro_tp->pokemones[j].id) {
 				encontrado = true;
 				break;
 			}

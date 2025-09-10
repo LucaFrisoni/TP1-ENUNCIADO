@@ -466,18 +466,18 @@ void tp1_union_tests()
 	tp1_t tp2 = { pokes2, 3 };
 
 	// Caso NULL
-	tp1_t *res_null = tp1_union(NULL, tp2);
+	tp1_t *res_null = tp1_union(NULL, &tp2);
 	pa2m_afirmar(res_null == NULL,
 		     "tp1_union devuelve NULL si un_tp es NULL");
 
 	// Caso otro_tp vacío
 	tp1_t tp_vacio = { NULL, 0 };
-	tp1_t *res_vacio = tp1_union(&tp1, tp_vacio);
+	tp1_t *res_vacio = tp1_union(&tp1, &tp_vacio);
 	pa2m_afirmar(res_vacio == NULL,
 		     "tp1_union devuelve NULL si otro_tp está vacío");
 
 	// Caso exitoso
-	tp1_t *res = tp1_union(&tp1, tp2);
+	tp1_t *res = tp1_union(&tp1, &tp2);
 	pa2m_afirmar(res != NULL,
 		     "tp1_union devuelve puntero no NULL en caso exitoso");
 	pa2m_afirmar(
@@ -517,18 +517,18 @@ void tp1_interseccion_tests()
 	tp1_t tp2 = { pokes2, 3 };
 
 	// Caso NULL
-	tp1_t *res_null = tp1_interseccion(NULL, tp2);
+	tp1_t *res_null = tp1_interseccion(NULL, &tp2);
 	pa2m_afirmar(res_null == NULL,
 		     "tp1_interseccion devuelve NULL si un_tp es NULL");
 
 	// Caso otro_tp vacío
 	tp1_t tp_vacio = { NULL, 0 };
-	tp1_t *res_vacio = tp1_interseccion(&tp1, tp_vacio);
+	tp1_t *res_vacio = tp1_interseccion(&tp1, &tp_vacio);
 	pa2m_afirmar(res_vacio == NULL,
 		     "tp1_interseccion devuelve NULL si otro_tp está vacío");
 
 	// Caso exitoso
-	tp1_t *res = tp1_interseccion(&tp1, tp2);
+	tp1_t *res = tp1_interseccion(&tp1, &tp2);
 	pa2m_afirmar(
 		res != NULL,
 		"tp1_interseccion devuelve puntero no NULL en caso exitoso");
@@ -559,18 +559,18 @@ void tp1_diferencia_tests()
 	tp1_t tp2 = { pokes2, 2 };
 
 	// Caso NULL
-	tp1_t *res_null = tp1_diferencia(NULL, tp2);
+	tp1_t *res_null = tp1_diferencia(NULL, &tp2);
 	pa2m_afirmar(res_null == NULL,
 		     "tp1_diferencia devuelve NULL si un_tp es NULL");
 
 	// Caso otro_tp vacío
 	tp1_t tp_vacio = { NULL, 0 };
-	tp1_t *res_vacio = tp1_diferencia(&tp1, tp_vacio);
+	tp1_t *res_vacio = tp1_diferencia(&tp1, &tp_vacio);
 	pa2m_afirmar(res_vacio == NULL,
 		     "tp1_diferencia devuelve NULL si otro_tp está vacío");
 
 	// Caso exitoso
-	tp1_t *res = tp1_diferencia(&tp1, tp2);
+	tp1_t *res = tp1_diferencia(&tp1, &tp2);
 	pa2m_afirmar(res != NULL,
 		     "tp1_diferencia devuelve puntero no NULL en caso exitoso");
 	pa2m_afirmar(res->cantidad == 2,

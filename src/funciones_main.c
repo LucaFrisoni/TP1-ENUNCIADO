@@ -197,7 +197,7 @@ int ejecutando_funciones(int argc, char *argv[])
 				return 1;
 			}
 
-			tp1_t *tp_resultado = tp1_union(tp1, *tp2);
+			tp1_t *tp_resultado = tp1_union(tp1, tp2);
 			tp1_guardar_archivo(tp_resultado, resultado);
 			free(tp2);
 			free(tp_resultado);
@@ -209,7 +209,7 @@ int ejecutando_funciones(int argc, char *argv[])
 				printf("Error leyendo el archivo 2\n");
 				return 1;
 			}
-			tp1_t *tp_resultado = tp1_interseccion(tp1, *tp2);
+			tp1_t *tp_resultado = tp1_interseccion(tp1, tp2);
 			tp1_guardar_archivo(tp_resultado, resultado);
 			free(tp2);
 			free(tp_resultado);
@@ -217,7 +217,7 @@ int ejecutando_funciones(int argc, char *argv[])
 			const char *archivo2 = argv[3];
 			const char *resultado = argv[4];
 			tp1_t *tp2 = tp1_leer_archivo(archivo2);
-			tp1_t *tp_resultado = tp1_diferencia(tp1, *tp2);
+			tp1_t *tp_resultado = tp1_diferencia(tp1, tp2);
 			if (!tp2) {
 				printf("Error leyendo el archivo 2\n");
 				return 1;
