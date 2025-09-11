@@ -158,7 +158,13 @@ int ejecutando_funciones(int argc, char *argv[])
 		} else if (strcmp(operacion, "mostrar") == 0) {
 			const char *tipo_mostrar = argv[3];
 
-			if (!argv[4]) {
+			if (!argv[4] && strcmp(tipo_mostrar, "nombre") == 0) {
+				bubbleSort_pokemones_alfabeticamente_asc_optimizado(
+					tp1);
+				mostrar_pokemones(tp1);
+			} else if (!argv[4] &&
+				   strcmp(tipo_mostrar, "id") == 0) {
+				bubbleSort_pokemones_id_asc_optimizado(tp1);
 				mostrar_pokemones(tp1);
 			} else {
 				const char *asc_o_desc = argv[4];
