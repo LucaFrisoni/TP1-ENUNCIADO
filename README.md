@@ -45,10 +45,12 @@ Esta función se encarga de:
 - ✅ Verificar que se haya pasado al menos un archivo **.csv**.
 - ✅ Validar que la operación solicitada (`buscar`, `mostrar`, `union`, `interseccion`, `diferencia`) sea correcta.
 - ✅ Chequear que la cantidad de parámetros sea la adecuada para cada operación.
-- ✅ Confirmar que los parámetros adicionales tengan el formato esperado (ej: `asc|desc`, `nombre|id`, `archivo.csv`).
+- ✅ Confirmar que los parámetros adicionales tengan el formato esperado (ej: `nombre|id`, `archivo.csv`).
 - ✅ Mostrar mensajes de error claros en caso de que falten argumentos o haya más de los necesarios.
 
 ⚠️ Si la validación falla, el programa termina sin ejecutar el flujo principal.
+
+![imagen1](img/image-1.png)
 
 Cuando se lo ejecuta con los parámetros correspondientes, la función principal que gestiona el flujo del programa es:
 
@@ -64,11 +66,15 @@ int ejecutando_funciones(int argc, char *argv[]);
 - Se cargan los registros en una estructura dinámica `tp1_t`.
 - En caso de error al leer el archivo, se muestra un mensaje y el programa finaliza.
 
+![image-2](img/image2.png)
+
 ---
 
 ### 2.2 Selección de operación (según `argv[2]`)
 
 #### 🔍 buscar
+
+![image3](img/image3.png)
 
 **Parámetros:** `<tipo_busqueda> <valor>`
 
@@ -82,9 +88,12 @@ int ejecutando_funciones(int argc, char *argv[]);
 
 #### 📑 mostrar
 
+![image4](img/image4.png)
+
 **Parámetros:** `<tipo_mostrar> <asc|desc>`
 
 - Permite mostrar todos los Pokémon ordenados:
+  - Los parametros `<asc|desc>` son opcionales
   - Por `nombre` en orden ascendente o descendente usando `bubbleSort_pokemones_alfabeticamente_*`.
   - Por `id` en orden ascendente o descendente usando `bubbleSort_pokemones_id_*`.
 - Luego se imprime la lista completa con `mostrar_pokemones()`.
@@ -92,6 +101,8 @@ int ejecutando_funciones(int argc, char *argv[]);
 ---
 
 #### 📂 union
+
+![image5](img/image5.png)
 
 **Parámetros:** `<archivo2.csv> <resultado.csv>`
 
@@ -103,6 +114,8 @@ int ejecutando_funciones(int argc, char *argv[]);
 
 #### 🔗 interseccion
 
+![image6](img/image6.png)
+
 **Parámetros:** `<archivo2.csv> <resultado.csv>`
 
 - Obtiene los Pokémon que están presentes en ambos archivos (`tp1_interseccion`).
@@ -112,6 +125,8 @@ int ejecutando_funciones(int argc, char *argv[]);
 ---
 
 #### ➖ diferencia
+
+![image7](img/image7.png)
 
 **Parámetros:** `<archivo2.csv> <resultado.csv>`
 
@@ -128,6 +143,17 @@ Al finalizar cualquier operación:
 - Se libera la memoria asociada a los **nombres** de cada Pokémon.
 - Se libera el **vector dinámico** de pokemones.
 - Se libera la **estructura principal `tp1`**.
+
+```c
+void tp1_destruir(tp1_t *tp1)
+{
+	for (size_t i = 0; i < tp1->cantidad; i++) {
+		free(tp1->pokemones[i].nombre);
+	}
+	free(tp1->pokemones);
+	free(tp1);
+};
+```
 
 Esto garantiza que no haya fugas de memoria durante la ejecución del programa.
 
@@ -171,15 +197,18 @@ Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`)
 
 #### Funciones de Memoria Dinámica
 
-- **`resize_buffer(char *buffer, size_t *capacidad)`** → duplica el tamaño del buffer dinámico.
-- **`creando_maloc(size_t size, const char *mensaje_error)`** → asigna memoria de manera segura y termina el programa si falla.
+- **`resize_buffer(char *buffer, size_t *capacidad)`** → duplica el tamaño del buffer dinámico, devuelve NULL en caso de error.
+  ![image8](img/image8.png)
+
+- **`creando_maloc(size_t size)`** → asigna memoria de manera segura, devuelve NULL en caso de error.
+  ![image9](img/image9.png)
 
 ---
 
 #### Funciones de Manejo de Archivos
 
-- **`archivo_open(const char *nombre_archivo)`** → abre un archivo para lectura.
-- **`archivo_crear(const char *nombre_archivo)`** → crea un archivo para escritura.
+- **`archivo_open(const char *nombre_archivo)`** → abre un archivo para lectura, devuelve NULL en caso de error.
+- **`archivo_crear(const char *nombre_archivo)`** → crea un archivo para escritura, devuelve NULL en caso de error.
 - **`leer_linea(FILE *archivo, size_t *capacidad)`** → lee una línea de un archivo CSV dinámicamente.
 - **`escribiendo_linea(tp1_t *tp1, FILE *archivo)`** → escribe los Pokémon en un archivo CSV.
 
@@ -191,6 +220,8 @@ Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`)
 - **`switch_pokemon(struct pokemon *p, int campo, const char *buffer)`** → asigna los valores de cada campo a la estructura Pokémon.
 - **`parsear_pokemon(char *linea)`** → convierte una línea CSV en un `struct pokemon`.
 - **`agregar_pokemon(tp1_t *tp1, struct pokemon *pk)`** → agrega un Pokémon al vector dinámico de `tp1_t`.
+  ![image10](image10.png)
+
 - **`tipo_a_string(enum tipo_pokemon tipo)`** → convierte el tipo de Pokémon a cadena.
 - **`validando_formato_csv(const char *archivo)`** → valida que el archivo tenga extensión `.csv`..
 - **`buscando_duplicados(tp1_t *tp1, struct pokemon *pk)`** → devuelve true si el pokemon ya se encontraba dentro del array dinamico.
@@ -226,8 +257,13 @@ El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos pue
 #### Funciones de Conjuntos
 
 - **`tp1_union(tp1_t *un_tp, tp1_t otro_tp)`** → combina dos colecciones de Pokémon eliminando duplicados.
+  ![image11](image11.png)
+
 - **`tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon comunes a ambos conjuntos.
+  ![image12](image12.png)
+
 - **`tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon que están en el primer conjunto pero no en el segundo.
+  ![image13](image13.png)
 
 ---
 
@@ -263,7 +299,7 @@ Se encarga de:
 
 - Validar los parámetros pasados por línea de comando.
 - Mostrar el mensaje inicial si la ejecución no respeta el formato.
-- Llamar a las funciones correspondientes según la operación pedida (`buscar`, `mostrar`, `union`, etc.).
+- Llamar a las funciones correspondientes según la operación pedida (`buscar`, `mostrar`, `union`, `interseccion`,`diferencia`).
 
 ## Tests Unitarios
 
@@ -285,7 +321,6 @@ Se realizan **76 pruebas unitarias** que incluyen:
 - **Operaciones de conjuntos**: unión, intersección y diferencia entre listas de Pokémon.
 - **Búsqueda**: por nombre e ID.
 - **Funciones auxiliares**: `resize_buffer()`, `creando_maloc()`, `tipo_a_string()`, y más.
-- **Manejo de memoria**: asegurar que no haya fugas ni errores al liberar estructuras dinámicas.
 
 ### Compilación y ejecución de tests
 
@@ -316,7 +351,7 @@ struct tp1 {
 
 ### 2. Diagramas
 
-Podés ver el diagrama completo en FigJam en el siguiente enlace:  
+Podés ver el diagrama completo en FigJam en el siguiente enlace de asi desearlo:  
 [Abrir diagrama en FigJam](https://www.figma.com/board/vowX8Y9YeQB6TmmbxEd99t/TP1?node-id=0-1&t=AGoofdv76DWUrmTd-1)
 Hay 2 diagrmas:
 ✅Diagrma de flujo

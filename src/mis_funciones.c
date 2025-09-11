@@ -11,8 +11,7 @@ struct tp1 {
 void bubbleSort_pokemones_alfabeticamente_asc_optimizado(tp1_t *tp1)
 {
 	if (!tp1 || tp1->cantidad == 0) {
-		printf("Para ordenar los pokemones debes pasarle tp1_t y deben de tener pokemones");
-		exit(1);
+		return;
 	}
 
 	size_t i, j;
@@ -37,8 +36,7 @@ void bubbleSort_pokemones_alfabeticamente_asc_optimizado(tp1_t *tp1)
 void bubbleSort_pokemones_alfabeticamente_desc_optimizado(tp1_t *tp1)
 {
 	if (!tp1 || tp1->cantidad == 0) {
-		printf("Para ordenar los pokemones debes pasarle tp1_t y deben de tener pokemones");
-		exit(1);
+		return;
 	}
 
 	size_t i, j;
@@ -64,8 +62,7 @@ void bubbleSort_pokemones_alfabeticamente_desc_optimizado(tp1_t *tp1)
 void bubbleSort_pokemones_id_asc_optimizado(tp1_t *tp1)
 {
 	if (!tp1 || tp1->cantidad == 0) {
-		printf("Para ordenar los pokemones debes pasarle tp1_t y deben de tener pokemones");
-		exit(1);
+		return;
 	}
 
 	size_t i, j;
@@ -89,8 +86,7 @@ void bubbleSort_pokemones_id_asc_optimizado(tp1_t *tp1)
 void bubbleSort_pokemones_id_desc_optimizado(tp1_t *tp1)
 {
 	if (!tp1 || tp1->cantidad == 0) {
-		printf("Para ordenar los pokemones debes pasarle tp1_t y deben de tener pokemones");
-		exit(1);
+		return;
 	}
 
 	size_t i, j;
@@ -145,13 +141,12 @@ char *resize_buffer(char *buffer, size_t *capacidad)
 	char *tmp = realloc(buffer, *capacidad);
 	if (!tmp) {
 		free(buffer);
-		printf("Error realloc en resize_buffer\n");
-		exit(1);
+		return NULL;
 	}
 	return tmp;
 }
 
-void *creando_maloc(size_t size, const char *mensaje_error)
+void *creando_maloc(size_t size)
 {
 	if (size == 0) {
 		return NULL;
@@ -159,16 +154,18 @@ void *creando_maloc(size_t size, const char *mensaje_error)
 
 	void *ptr = malloc(size);
 	if (!ptr) {
-		printf("%s\n", mensaje_error);
-		exit(1);
+		return NULL;
 	}
 	return ptr;
 }
 // --------------------------------------------------------------------------------------------------------
 FILE *archivo_open(const char *nombre_archivo)
 {
+	if (!nombre_archivo) {
+		return NULL;
+	}
 	FILE *archivo = fopen(nombre_archivo, "r");
-	if (!archivo || !nombre_archivo) {
+	if (!archivo) {
 		return NULL;
 	}
 
@@ -183,8 +180,7 @@ FILE *archivo_crear(const char *nombre_archivo)
 
 	FILE *archivo = fopen(nombre_archivo, "w");
 	if (!archivo) {
-		printf("Error abriendo creando el archivo\n");
-		exit(1);
+		return NULL;
 	}
 
 	return archivo;
@@ -200,9 +196,7 @@ char *leer_linea(FILE *archivo, size_t *capacidad)
 		return NULL;
 	}
 
-	buffer = creando_maloc(
-		*capacidad,
-		"Error asignando memoria para buffer dinámico -leer linea-");
+	buffer = creando_maloc(*capacidad);
 
 	while (leyendo) {
 		if (fgets(&buffer[longitud], (int)(*capacidad - longitud),
@@ -259,31 +253,29 @@ bool buscando_duplicados(tp1_t *tp1, struct pokemon *pk)
 	for (size_t i = 0; i < tp1->cantidad; i++) {
 		if (tp1->pokemones[i].id == pk->id) {
 			// Es duplicado
-			free(pk->nombre);
-			free(pk);
 			return true;
 		}
 	}
 	return false;
 }
 
-void switch_pokemon(struct pokemon *p, int campo, const char *buffer)
+bool switch_pokemon(struct pokemon *p, int campo, const char *buffer)
 {
 	switch (campo) {
-	case 0:
+	case 0: // ID
 		p->id = atoi(buffer);
-		break;
+		return true;
 
-	case 1:
+	case 1: // Nombre
 		p->nombre = malloc(strlen(buffer) + 1);
 		if (!p->nombre) {
 			printf("Error al asignar memoria para nombre\n");
-			return;
+			return false;
 		}
 		strcpy(p->nombre, buffer);
-		break;
+		return true;
 
-	case 2:
+	case 2: // Tipo
 		if (strcmp(buffer, "ELEC") == 0)
 			p->tipo = TIPO_ELEC;
 		else if (strcmp(buffer, "FUEG") == 0)
@@ -300,22 +292,24 @@ void switch_pokemon(struct pokemon *p, int campo, const char *buffer)
 			p->tipo = TIPO_PSI;
 		else if (strcmp(buffer, "LUCH") == 0)
 			p->tipo = TIPO_LUCH;
-		else {
-			return; // tipo inválido
-		}
-		break;
+		else
+			return false; // tipo inválido
+		return true;
 
-	case 3:
+	case 3: // Ataque
 		p->ataque = atoi(buffer);
-		break;
+		return true;
 
-	case 4:
+	case 4: // Defensa
 		p->defensa = atoi(buffer);
-		break;
+		return true;
 
-	case 5:
+	case 5: // Velocidad
 		p->velocidad = atoi(buffer);
-		break;
+		return true;
+
+	default:
+		return false; // campo inválido
 	}
 }
 
@@ -335,12 +329,9 @@ struct pokemon *parsear_pokemon(char *linea)
 		return NULL;
 	}
 
-	buffer = creando_maloc(
-		capacidad,
-		"Error asignando memoria para buffer dinámico -parse pokemon-");
+	buffer = creando_maloc(capacidad);
 
-	p = creando_maloc(sizeof(struct pokemon),
-			  "Error asignando memoria para el pokemon");
+	p = creando_maloc(sizeof(struct pokemon));
 
 	while (leyendo) {
 		c = linea[i];
@@ -354,7 +345,14 @@ struct pokemon *parsear_pokemon(char *linea)
 		if (c == ',' || c == '\0') {
 			buffer[buf_idx] = '\0'; // cierro string
 
-			switch_pokemon(p, campo, buffer);
+			if (!switch_pokemon(p, campo, buffer)) {
+				if (p->nombre) {
+					free(p->nombre);
+				}
+				free(p);
+				free(buffer);
+				return NULL; // pokemon inválido
+			}
 
 			campo++;
 			i++;
@@ -392,14 +390,15 @@ struct pokemon *parsear_pokemon(char *linea)
 void agregar_pokemon(tp1_t *tp1, struct pokemon *pk)
 {
 	if (buscando_duplicados(tp1, pk)) {
+		free(pk->nombre);
+		free(pk);
 		return; //si es duplicado
 	}
 
 	struct pokemon *tmp = realloc(
 		tp1->pokemones, sizeof(struct pokemon) * (tp1->cantidad + 1));
 	if (!tmp) {
-		printf("Error realloc al agregar pokemon\n");
-		exit(1);
+		return;
 	}
 	tp1->pokemones = tmp;
 
@@ -414,15 +413,26 @@ void agregar_pokemon(tp1_t *tp1, struct pokemon *pk)
 // Caso: pokemon que ya está en otro tp1
 void agregar_pokemon_existente(tp1_t *tp1, struct pokemon *pk)
 {
+	if (buscando_duplicados(tp1, pk)) {
+		return; //si es duplicado
+	}
+
 	struct pokemon *tmp = realloc(
 		tp1->pokemones, sizeof(struct pokemon) * (tp1->cantidad + 1));
 	if (!tmp) {
-		printf("Error realloc al agregar pokemon\n");
-		exit(1);
+		return;
 	}
 
 	tp1->pokemones = tmp;
-	tp1->pokemones[tp1->cantidad] = *pk;
+
+	tp1->pokemones[tp1->cantidad].id = pk->id;
+	tp1->pokemones[tp1->cantidad].nombre = malloc(strlen(pk->nombre) + 1);
+	strcpy(tp1->pokemones[tp1->cantidad].nombre, pk->nombre);
+	tp1->pokemones[tp1->cantidad].tipo = pk->tipo;
+	tp1->pokemones[tp1->cantidad].ataque = pk->ataque;
+	tp1->pokemones[tp1->cantidad].defensa = pk->defensa;
+	tp1->pokemones[tp1->cantidad].velocidad = pk->velocidad;
+
 	tp1->cantidad++;
 }
 // --------------------------------------------------------------------------------------------------------

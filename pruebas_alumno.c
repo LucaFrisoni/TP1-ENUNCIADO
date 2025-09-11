@@ -259,35 +259,38 @@ void switch_pokemon_tests()
 	struct pokemon p = { 0 };
 
 	// Campo 0: id
-	switch_pokemon(&p, 0, "25");
-	pa2m_afirmar(p.id == 25, "Campo 0 asigna correctamente el id");
+	bool ok = switch_pokemon(&p, 0, "25");
+	pa2m_afirmar(ok && p.id == 25, "Campo 0 asigna correctamente el id");
 
 	// Campo 1: nombre
-	switch_pokemon(&p, 1, "Pikachu");
-	pa2m_afirmar(strcmp(p.nombre, "Pikachu") == 0,
+	ok = switch_pokemon(&p, 1, "Pikachu");
+	pa2m_afirmar(ok && strcmp(p.nombre, "Pikachu") == 0,
 		     "Campo 1 asigna correctamente el nombre");
 	free(p.nombre);
 	p.nombre = NULL;
 
 	// Campo 2: tipo válido
-	switch_pokemon(&p, 2, "ELEC");
-	pa2m_afirmar(p.tipo == TIPO_ELEC,
+	ok = switch_pokemon(&p, 2, "ELEC");
+	pa2m_afirmar(ok && p.tipo == TIPO_ELEC,
 		     "Campo 2 asigna el tipo correctamente");
 
 	// Campo 2: tipo inválido no cambia
 	p.tipo = TIPO_NORM;
-	switch_pokemon(&p, 2, "INVALIDO");
-	pa2m_afirmar(p.tipo == TIPO_NORM,
+	ok = switch_pokemon(&p, 2, "INVALIDO");
+	pa2m_afirmar(!ok && p.tipo == TIPO_NORM,
 		     "Campo 2 con tipo inválido no modifica el tipo");
 
 	// Campos 3, 4, 5: ataque, defensa, velocidad
-	switch_pokemon(&p, 3, "55");
-	switch_pokemon(&p, 4, "40");
-	switch_pokemon(&p, 5, "90");
+	ok = switch_pokemon(&p, 3, "55");
+	pa2m_afirmar(ok && p.ataque == 55,
+		     "Campo 3 asigna ataque correctamente");
 
-	pa2m_afirmar(p.ataque == 55, "Campo 3 asigna ataque correctamente");
-	pa2m_afirmar(p.defensa == 40, "Campo 4 asigna defensa correctamente");
-	pa2m_afirmar(p.velocidad == 90,
+	ok = switch_pokemon(&p, 4, "40");
+	pa2m_afirmar(ok && p.defensa == 40,
+		     "Campo 4 asigna defensa correctamente");
+
+	ok = switch_pokemon(&p, 5, "90");
+	pa2m_afirmar(ok && p.velocidad == 90,
 		     "Campo 5 asigna velocidad correctamente");
 }
 
@@ -336,9 +339,17 @@ void agregar_pokemon_funciona()
 	tp1.cantidad = 0;
 	tp1.pokemones = NULL;
 
-	struct pokemon p = { 1, "Pikachu", TIPO_ELEC, 55, 40, 90 };
+	// Creo el pokemon dinamicamente
+	struct pokemon *p = malloc(sizeof(struct pokemon));
+	p->id = 1;
+	p->tipo = TIPO_ELEC;
+	p->ataque = 55;
+	p->defensa = 40;
+	p->velocidad = 90;
+	p->nombre = malloc(strlen("Pikachu") + 1);
+	strcpy(p->nombre, "Pikachu");
 
-	agregar_pokemon(&tp1, &p);
+	agregar_pokemon(&tp1, p);
 
 	pa2m_afirmar(tp1.cantidad == 1 && tp1.pokemones[0].id == 1 &&
 			     strcmp(tp1.pokemones[0].nombre, "Pikachu") == 0 &&
@@ -348,7 +359,8 @@ void agregar_pokemon_funciona()
 			     tp1.pokemones[0].velocidad == 90,
 		     "Pokemon agregado correctamente con todos sus campos");
 
-	free(tp1.pokemones); // liberamos memoria
+	free(tp1.pokemones[0].nombre);
+	free(tp1.pokemones);
 }
 
 void bubbleSort_tests()

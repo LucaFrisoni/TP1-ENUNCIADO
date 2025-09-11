@@ -19,13 +19,16 @@ tp1_t *tp1_leer_archivo(const char *nombre)
 	size_t capacidad = 128;
 	struct pokemon *pk;
 
+	if (!nombre) {
+		return NULL;
+	}
+
 	archivo = archivo_open(nombre);
 	if (!archivo) {
 		return NULL;
 	}
 
-	tp1 = creando_maloc(sizeof(tp1_t),
-			    "Error asignando memoria para el struct tp1");
+	tp1 = creando_maloc(sizeof(tp1_t));
 	tp1->cantidad = 0;
 	tp1->pokemones = NULL;
 
@@ -76,15 +79,14 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 		return NULL;
 	}
 
-	tp3 = creando_maloc(sizeof(tp1_t),
-			    "Error en creando malloc tp1 union\n");
+	tp3 = creando_maloc(sizeof(tp1_t));
 
 	tp3->cantidad = 0;
 	tp3->pokemones = NULL;
 
 	// Copiamos todos los pokemones de un_tp
 	for (i = 0; i < un_tp->cantidad; i++) {
-		agregar_pokemon(tp3, &un_tp->pokemones[i]);
+		agregar_pokemon_existente(tp3, &un_tp->pokemones[i]);
 	}
 
 	// Agregamos de otro_tp los que no están
@@ -111,8 +113,7 @@ tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 		return NULL;
 	}
 
-	tp1_t *tp3 = creando_maloc(sizeof(tp1_t),
-				   "Error creando malloc para interseccion");
+	tp1_t *tp3 = creando_maloc(sizeof(tp1_t));
 	tp3->cantidad = 0;
 	tp3->pokemones = NULL;
 
@@ -146,8 +147,7 @@ tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 		return NULL;
 	}
 
-	tp1_t *tp3 = creando_maloc(sizeof(tp1_t),
-				   "Error creando malloc para diferencia");
+	tp1_t *tp3 = creando_maloc(sizeof(tp1_t));
 	tp3->cantidad = 0;
 	tp3->pokemones = NULL;
 
@@ -237,6 +237,10 @@ size_t tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *),
 {
 	size_t i;
 	size_t count = 0;
+	if (!un_tp || !f || !extra) {
+		return 0;
+	}
+
 	bubbleSort_pokemones_id_asc_optimizado(un_tp);
 	for (i = 0; i < un_tp->cantidad; i++) {
 		count++;

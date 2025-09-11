@@ -61,10 +61,9 @@ char *resize_buffer(char *buffer, size_t *capacidad);
 /**
  * @brief Reserva memoria dinámica con malloc y valida errores.
  * @param size Cantidad de bytes a reservar.
- * @param mensaje_error Mensaje a imprimir si malloc falla.
  * @return Puntero a la memoria reservada, o termina el programa en caso de error.
  */
-void *creando_maloc(size_t size, const char *mensaje_error);
+void *creando_maloc(size_t size);
 
 // --------------------------------------------------------------------------------------------------------
 // Manejo de archivos
@@ -119,13 +118,15 @@ bool parse_pokemon_validations(char *linea);
  * @return true si el pokemon ya existe (duplicado), false en caso contrario.
  */
 bool buscando_duplicados(tp1_t *tp1, struct pokemon *pk);
+
 /**
  * @brief Asigna un valor de un campo leído a un pokemon.
  * @param p Puntero al pokemon a modificar.
  * @param campo Número del campo (0=id, 1=nombre, 2=tipo, 3=ataque, 4=defensa, 5=velocidad).
  * @param buffer String con el valor a asignar.
+ * @return true si la asignación fue exitosa, false si hubo error (tipo inválido o fallo de memoria).
  */
-void switch_pokemon(struct pokemon *p, int campo, const char *buffer);
+bool switch_pokemon(struct pokemon *p, int campo, const char *buffer);
 
 /**
  * @brief Convierte una línea CSV en un struct pokemon.

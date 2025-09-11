@@ -22,7 +22,8 @@ void mensaje_inicial()
 	       "\033[1;32mTipos de operaciones:\033[0m\n"
 	       "  buscar | mostrar | union | diferencia | interseccion\n\n"
 	       "Dependiendo de la operación elegida, deberás pasar más parámetros:\n"
-	       "  - Caso 'buscar' o 'mostrar': <nombre_o_id> <valor_a_buscar> 🔍\n"
+	       "  - Caso 'buscar': <nombre_o_id> <valor_a_buscar> 🔍\n"
+	       "  - Caso 'mostrar': <nombre_o_id> <asc_o_desc>(opcional) 🔍\n"
 	       "  - Caso 'union', 'diferencia' o 'interseccion': <archivo2.csv> <resultado.csv> 📁\n"
 	       "    (el archivo resultado se crea automáticamente, no hace falta que exista)\n\n"
 	       "\033[1;35m💡 Tip: Si algo falla, revisá que los parámetros estén correctos y que los archivos existan.\033[0m\n");
@@ -76,7 +77,7 @@ int validando_params(int argc, char *argv[])
 
 		// Validaciones mostrar
 		if (strcmp(operacion, "mostrar") == 0) {
-			if (argc < 5) {
+			if (argc < 4) {
 				printf("Falta argumento: debe pasar 'nombre' o 'id' y el valor a buscar\n");
 				return 1;
 			}
@@ -84,12 +85,6 @@ int validando_params(int argc, char *argv[])
 			if (strcmp(tipo_mostrar, "nombre") != 0 &&
 			    strcmp(tipo_mostrar, "id") != 0) {
 				printf("El cuarto argumento para mostrar debe ser 'nombre' o 'id'\n");
-				return 1;
-			}
-			const char *asc_o_desc = argv[4];
-			if (strcmp(asc_o_desc, "asc") != 0 &&
-			    strcmp(asc_o_desc, "desc") != 0) {
-				printf("El ultimo argumento debe indicar si quiere mostrar asc o desc'\n");
 				return 1;
 			}
 
@@ -162,31 +157,34 @@ int ejecutando_funciones(int argc, char *argv[])
 
 		} else if (strcmp(operacion, "mostrar") == 0) {
 			const char *tipo_mostrar = argv[3];
-			const char *asc_o_desc = argv[4];
 
-			if (strcmp(tipo_mostrar, "nombre") == 0) {
-				if (strcmp(asc_o_desc, "asc") == 0) {
-					bubbleSort_pokemones_alfabeticamente_asc_optimizado(
-						tp1);
-					mostrar_pokemones(tp1);
-				} else {
-					bubbleSort_pokemones_alfabeticamente_desc_optimizado(
-						tp1);
-					mostrar_pokemones(tp1);
-				}
-
+			if (!argv[4]) {
+				mostrar_pokemones(tp1);
 			} else {
-				if (strcmp(asc_o_desc, "asc") == 0) {
-					bubbleSort_pokemones_id_asc_optimizado(
-						tp1);
-					mostrar_pokemones(tp1);
+				const char *asc_o_desc = argv[4];
+
+				if (strcmp(tipo_mostrar, "nombre") == 0) {
+					if (strcmp(asc_o_desc, "asc") == 0) {
+						bubbleSort_pokemones_alfabeticamente_asc_optimizado(
+							tp1);
+						mostrar_pokemones(tp1);
+					} else {
+						bubbleSort_pokemones_alfabeticamente_desc_optimizado(
+							tp1);
+						mostrar_pokemones(tp1);
+					}
 				} else {
-					bubbleSort_pokemones_id_desc_optimizado(
-						tp1);
-					mostrar_pokemones(tp1);
+					if (strcmp(asc_o_desc, "asc") == 0) {
+						bubbleSort_pokemones_id_asc_optimizado(
+							tp1);
+						mostrar_pokemones(tp1);
+					} else {
+						bubbleSort_pokemones_id_desc_optimizado(
+							tp1);
+						mostrar_pokemones(tp1);
+					}
 				}
 			}
-
 		} else if (strcmp(operacion, "union") == 0) {
 			const char *archivo2 = argv[3];
 			const char *resultado = argv[4];
@@ -199,8 +197,9 @@ int ejecutando_funciones(int argc, char *argv[])
 
 			tp1_t *tp_resultado = tp1_union(tp1, tp2);
 			tp1_guardar_archivo(tp_resultado, resultado);
-			free(tp2);
-			free(tp_resultado);
+
+			tp1_destruir(tp2);
+			tp1_destruir(tp_resultado);
 		} else if (strcmp(operacion, "interseccion") == 0) {
 			const char *archivo2 = argv[3];
 			const char *resultado = argv[4];
@@ -211,8 +210,8 @@ int ejecutando_funciones(int argc, char *argv[])
 			}
 			tp1_t *tp_resultado = tp1_interseccion(tp1, tp2);
 			tp1_guardar_archivo(tp_resultado, resultado);
-			free(tp2);
-			free(tp_resultado);
+			tp1_destruir(tp2);
+			tp1_destruir(tp_resultado);
 		} else if (strcmp(operacion, "diferencia") == 0) {
 			const char *archivo2 = argv[3];
 			const char *resultado = argv[4];
@@ -223,8 +222,8 @@ int ejecutando_funciones(int argc, char *argv[])
 				return 1;
 			}
 			tp1_guardar_archivo(tp_resultado, resultado);
-			free(tp2);
-			free(tp_resultado);
+			tp1_destruir(tp2);
+			tp1_destruir(tp_resultado);
 		}
 
 		tp1_destruir(tp1);
