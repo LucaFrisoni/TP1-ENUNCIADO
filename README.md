@@ -263,6 +263,7 @@ El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos pue
   ![image12](img/image12.png)
 
 - **`tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon que están en el primer conjunto pero no en el segundo.
+
   ![image13](img/image13.png)
 
 ---
