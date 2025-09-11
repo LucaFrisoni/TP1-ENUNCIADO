@@ -198,9 +198,11 @@ Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`)
 #### Funciones de Memoria Dinámica
 
 - **`resize_buffer(char *buffer, size_t *capacidad)`** → duplica el tamaño del buffer dinámico, devuelve NULL en caso de error.
+
   ![image8](img/image8.png)
 
 - **`creando_maloc(size_t size)`** → asigna memoria de manera segura, devuelve NULL en caso de error.
+
   ![image9](img/image9.png)
 
 ---
@@ -220,6 +222,7 @@ Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`)
 - **`switch_pokemon(struct pokemon *p, int campo, const char *buffer)`** → asigna los valores de cada campo a la estructura Pokémon.
 - **`parsear_pokemon(char *linea)`** → convierte una línea CSV en un `struct pokemon`.
 - **`agregar_pokemon(tp1_t *tp1, struct pokemon *pk)`** → agrega un Pokémon al vector dinámico de `tp1_t`.
+
   ![image10](img/image10.png)
 
 - **`tipo_a_string(enum tipo_pokemon tipo)`** → convierte el tipo de Pokémon a cadena.
@@ -257,9 +260,11 @@ El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos pue
 #### Funciones de Conjuntos
 
 - **`tp1_union(tp1_t *un_tp, tp1_t otro_tp)`** → combina dos colecciones de Pokémon eliminando duplicados.
+
   ![image11](img/image11.png)
 
 - **`tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon comunes a ambos conjuntos.
+
   ![image12](img/image12.png)
 
 - **`tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon que están en el primer conjunto pero no en el segundo.
