@@ -53,14 +53,14 @@ void creando_malloc_tests()
 {
 	// Caso 1: malloc devuelve memoria válida
 	{
-		void *ptr = creando_maloc(10, "Error malloc");
+		void *ptr = creando_maloc(10);
 		pa2m_afirmar(ptr != NULL, "Malloc devuelve memoria válida");
 		free(ptr);
 	}
 
 	// Caso 2: memoria asignada es usable
 	{
-		int *arr = creando_maloc(4 * sizeof(int), "Error malloc");
+		int *arr = creando_maloc(4 * sizeof(int));
 		arr[0] = 42;
 		arr[1] = 99;
 		pa2m_afirmar(arr[0] == 42 && arr[1] == 99,
@@ -70,7 +70,7 @@ void creando_malloc_tests()
 
 	// Caso 3: size 0 devuelve NULL
 	{
-		void *ptr = creando_maloc(0, "Error malloc");
+		void *ptr = creando_maloc(0);
 		pa2m_afirmar(ptr == NULL, "Si size es 0, devuelve NULL");
 	}
 }
@@ -224,15 +224,17 @@ void escribiendo_linea_escribe_correctamente()
 
 	archivo = fopen(nombre, "r");
 	char buffer[256];
-	fgets(buffer, sizeof(buffer), archivo);
-	buffer[strcspn(buffer, "\n")] = '\0'; // elimina \n de mas
+	if (fgets(buffer, sizeof(buffer), archivo) != NULL) {
+		buffer[strcspn(buffer, "\n")] = '\0'; // eliminar \n
+		pa2m_afirmar(strcmp(buffer, "1,Pikachu,ELEC,55,40,90") == 0,
+			     "Primera linea escrita correctamente");
+	}
 
-	pa2m_afirmar(strcmp(buffer, "1,Pikachu,ELEC,55,40,90") == 0,
-		     "Primera linea escrita correctamente");
-
-	fgets(buffer, sizeof(buffer), archivo);
-	pa2m_afirmar(strcmp(buffer, "2,Charmander,FUEG,52,43,65\n") == 0,
-		     "Segunda linea escrita correctamente");
+	if (fgets(buffer, sizeof(buffer), archivo) != NULL) {
+		buffer[strcspn(buffer, "\n")] = '\0';
+		pa2m_afirmar(strcmp(buffer, "2,Charmander,FUEG,52,43,65") == 0,
+			     "Segunda linea escrita correctamente");
+	}
 
 	fclose(archivo);
 	remove(nombre);
@@ -302,6 +304,10 @@ void parsear_pokemon_tests()
 		struct pokemon *p = parsear_pokemon(linea);
 		pa2m_afirmar(p == NULL,
 			     "Si la linea contiene ';', devuelve NULL");
+		if (p) {
+			free(p->nombre);
+			free(p);
+		}
 	}
 
 	// Caso 2: menos de 6 campos → devuelve NULL
@@ -310,6 +316,10 @@ void parsear_pokemon_tests()
 		struct pokemon *p = parsear_pokemon(linea);
 		pa2m_afirmar(p == NULL,
 			     "Si hay menos de 6 campos, devuelve NULL");
+		if (p) {
+			free(p->nombre);
+			free(p);
+		}
 	}
 
 	// Caso 3: más de 6 campos → devuelve NULL
@@ -318,6 +328,10 @@ void parsear_pokemon_tests()
 		struct pokemon *p = parsear_pokemon(linea);
 		pa2m_afirmar(p == NULL,
 			     "Si hay más de 6 campos, devuelve NULL");
+		if (p) {
+			free(p->nombre);
+			free(p);
+		}
 	}
 
 	// Caso 4: línea válida → devuelve struct pokemon
@@ -509,9 +523,8 @@ void tp1_union_tests()
 		ok,
 		"tp1_union contiene todos los pokemones esperados (IDs correctos)");
 
-	// Liberamos memoria
-	free(res->pokemones);
-	free(res);
+	// Libero memoria
+	tp1_destruir(res);
 }
 
 void tp1_interseccion_tests()
@@ -552,9 +565,8 @@ void tp1_interseccion_tests()
 	pa2m_afirmar(res->pokemones[0].id == 3,
 		     "tp1_interseccion contiene el pokemon correcto");
 
-	// Liberamos memoria
-	free(res->pokemones);
-	free(res);
+	// Libero memoria
+	tp1_destruir(res);
 }
 
 void tp1_diferencia_tests()
@@ -600,8 +612,7 @@ void tp1_diferencia_tests()
 	pa2m_afirmar(ok,
 		     "tp1_diferencia contiene los pokemones correctos (IDs)");
 
-	free(res->pokemones);
-	free(res);
+	tp1_destruir(res);
 }
 
 void tp1_buscar_nombre_tests()

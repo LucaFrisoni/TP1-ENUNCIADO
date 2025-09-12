@@ -74,8 +74,11 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 	tp1_t *tp3;
 	size_t i, j, k;
 	bool existe;
+	if (!un_tp || !otro_tp) {
+		return NULL;
+	}
 
-	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
+	if (otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -109,7 +112,11 @@ tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp)
 // --------------------------------------------------------------------------------------------------------
 tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp)
 {
-	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
+	if (!un_tp || !otro_tp) {
+		return NULL;
+	}
+
+	if (otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -143,7 +150,11 @@ tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp)
 {
 	bool encontrado;
 
-	if (!un_tp || otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
+	if (!un_tp || !otro_tp) {
+		return NULL;
+	}
+
+	if (otro_tp->cantidad == 0 || un_tp->cantidad == 0) {
 		return NULL;
 	}
 
@@ -237,7 +248,7 @@ size_t tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *),
 {
 	size_t i;
 	size_t count = 0;
-	if (!un_tp || !f || !extra) {
+	if (!un_tp || !f) {
 		return 0;
 	}
 

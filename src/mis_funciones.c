@@ -332,11 +332,16 @@ struct pokemon *parsear_pokemon(char *linea)
 	buffer = creando_maloc(capacidad);
 
 	p = creando_maloc(sizeof(struct pokemon));
+	p->nombre = NULL;
 
 	while (leyendo) {
 		c = linea[i];
 
 		if (c == ';') {
+			if (p->nombre) {
+				free(p->nombre);
+			}
+
 			free(buffer);
 			free(p);
 			return NULL;

@@ -22,7 +22,8 @@ gcc pruebas_alumno.c src/*.c -o tests
 - Para ejecutar con valgrind:
 
 ```bash
-línea con valgrind
+valgrind --leak-check=full --show-leak-kinds=all ./programa
+valgrind --leak-check=full --show-leak-kinds=all ./tests
 ```
 
 ---
