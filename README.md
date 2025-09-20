@@ -9,8 +9,7 @@
 - Para compilar:
 
 ```bash
-gcc main.c src/*.c -o programa
-gcc pruebas_alumno.c src/*.c -o tests
+makefile compilar
 ```
 
 - Para ejecutar:
@@ -22,15 +21,13 @@ gcc pruebas_alumno.c src/*.c -o tests
 - Para ejecutar con valgrind:
 
 ```bash
-valgrind --leak-check=full --show-leak-kinds=all ./programa
-valgrind --leak-check=full --show-leak-kinds=all ./tests
+makefile valgrind
 ```
 
 ---
 
 ## Funcionamiento
 
-El programa se compila con `gcc` (o cualquier compilador compatible con C).  
 Una vez generado el ejecutable, si se lo ejecuta **sin parámetros**, se mostrará un mensaje inicial en consola explicando la forma correcta de uso, los parámetros que admite y algunos consejos de ejecución.
 
 ### 1. Validación de parámetros
@@ -41,17 +38,17 @@ Antes de ejecutar cualquier operación, se invoca la función:
 int validando_params(int argc, char *argv[]);
 ```
 
-Esta función se encarga de:
+**📌Esta función se encarga de:**
 
-- ✅ Verificar que se haya pasado al menos un archivo **.csv**.
-- ✅ Validar que la operación solicitada (`buscar`, `mostrar`, `union`, `interseccion`, `diferencia`) sea correcta.
-- ✅ Chequear que la cantidad de parámetros sea la adecuada para cada operación.
-- ✅ Confirmar que los parámetros adicionales tengan el formato esperado (ej: `nombre|id`, `archivo.csv`).
-- ✅ Mostrar mensajes de error claros en caso de que falten argumentos o haya más de los necesarios.
+- 🔹 Verificar que se haya pasado al menos un archivo **.csv**.
+- 🔹 Validar que la operación solicitada (`buscar`, `mostrar`, `union`, `interseccion`, `diferencia`) sea correcta.
+- 🔹 Chequear que la cantidad de parámetros sea la adecuada para cada operación.
+- 🔹 Confirmar que los parámetros adicionales tengan el formato esperado (ej: `nombre|id`, `archivo.csv`).
+- 🔹 Mostrar mensajes de error claros en caso de que falten argumentos o haya más de los necesarios.
 
 ⚠️ Si la validación falla, el programa termina sin ejecutar el flujo principal.
 
-![imagen1](img/image-1.png)
+![imagen1](img/image1.png)
 
 Cuando se lo ejecuta con los parámetros correspondientes, la función principal que gestiona el flujo del programa es:
 
@@ -61,29 +58,52 @@ int ejecutando_funciones(int argc, char *argv[]);
 
 ### 2.Flujo de Ejecución
 
-### 2.1 Lectura del archivo principal
+### 2.1 Lectura principal (según `argv[1]`)
 
-- Se abre el archivo CSV indicado en `argv[1]`.
-- Se cargan los registros en una estructura dinámica `tp1_t`.
-- En caso de error al leer el archivo, se muestra un mensaje y el programa finaliza.
+Se realiza la lectura de un archivo **.csv** cuya ubicacion fue pasado por parametro con `tp1_leer_archivo()`.
 
-![image-2](img/image2.png)
+```c
+tp1_t *tp1_leer_archivo(const char *nombre);
+```
 
----
+**📌Esta funcion se encarga de:**
+
+- 🔹 Manejar la apertura del archivo **.csv**📑 con `manejador_de_archivos_open()`
+- 🔹 Crear la estructura **tp1_t**.
+- 🔹 Leer y validar todas las lineas del archivo (se lee dinamicamente) con `leer_linea()`.
+- 🔹 Transforma la linea de texto en un tipo pokemon **struct pokemon** si es valido con `parsear_pokemon()` y demas funciones internas.
+- 🔹 Agregar el pokemon parseado a la estructrua **tp1_t** con `agregar_pokemon()`.
+- 🔹 Ordenar ascendemente los pokemones por id una vez finalizada la lectura completa del archivo con `bubbleSort_pokemones_id_asc_optimizado()`.
+- 🔹 Correcta liberacion de memoria y cierre de archivos.
+- 🔹 Retorno de la estructura con los pokemones y su cantidad.
+
+- ⚠️ En caso de que el archivo no respete el formato, no se pueda abrir o falle la reserva de memoria, la función devuelve `NULL`.
+
+![image2](img/image2.png)
 
 ### 2.2 Selección de operación (según `argv[2]`)
 
+El sistema permite al usuario elegir entre varias operaciones predefinidas.
+
 #### 🔍 buscar
+
+```c
+struct pokemon *tp1_buscar_nombre(tp1_t *tp, const char *nombre);
+```
+
+```c
+struct pokemon *tp1_buscar_id(tp1_t *tp, int id)
+```
 
 ![image3](img/image3.png)
 
 **Parámetros:** `<tipo_busqueda> <valor>`
 
-- Permite buscar un Pokémon en el archivo:
+- 🔹Permite buscar un Pokémon en el archivo:
   - `nombre`: busca por nombre con `tp1_buscar_nombre()`.
   - `id`: busca por ID con `tp1_buscar_id()`.
-- Si lo encuentra, se muestra con `mostrar_pokemon()`.
-- Si no existe, se muestra un mensaje de error.
+- 🔹Si lo encuentra, se muestra con `mostrar_pokemon()`.
+- 🔹Si no existe, devuelve **NULL** e imprime que no fue encontrado
 
 ---
 
@@ -91,250 +111,164 @@ int ejecutando_funciones(int argc, char *argv[]);
 
 ![image4](img/image4.png)
 
-**Parámetros:** `<tipo_mostrar> <asc|desc>`
+**Parámetros:** `<tipo_mostrar>`
 
 - Permite mostrar todos los Pokémon ordenados:
-  - Los parametros `<asc|desc>` son opcionales
-  - Por `nombre` en orden ascendente o descendente usando `bubbleSort_pokemones_alfabeticamente_*`.
-  - Por `id` en orden ascendente o descendente usando `bubbleSort_pokemones_id_*`.
-- Luego se imprime la lista completa con `mostrar_pokemones()`.
+  - 🔹Por `nombre` en orden ascendente.
+  - 🔹Por `id` en orden ascendente.
+- Luego se imprime la lista completa con `mostrar_pokemon()` llamando al iterador interno `tp1_con_cada_pokemon()`.
 
 ---
 
-#### 📂 union
+#### 📂 union | 🔗 interseccion | ➖ diferencia
+
+```c
+tp1_t *tp1_union(tp1_t *un_tp, tp1_t *otro_tp);
+```
+
+```c
+tp1_t *tp1_interseccion(tp1_t *un_tp, tp1_t *otro_tp);
+```
+
+```c
+tp1_t *tp1_diferencia(tp1_t *un_tp, tp1_t *otro_tp);
+```
 
 ![image5](img/image5.png)
 
 **Parámetros:** `<archivo2.csv> <resultado.csv>`
 
-- Combina dos colecciones de Pokémon (`tp1_union`).
-- El resultado se guarda en un archivo nuevo con `tp1_guardar_archivo()`.
-- Se liberan las estructuras auxiliares utilizadas.
+**Segun la operacion:**
 
----
+- 🔹Combina dos colecciones de Pokémon (`tp1_union`).
+- 🔹Obtiene los Pokémon que están presentes en ambos archivos (`tp1_interseccion`).
+- 🔹Obtiene los Pokémon que están en el primer archivo pero no en el segundo (`tp1_diferencia`).
 
-#### 🔗 interseccion
+**Proceso comun:**
 
-![image6](img/image6.png)
+- 🔹Se crea una nueva estructura **tp1_t** donde seran agregados los pokemones
+- 🔹Se realiza una copia de los pokemones con `copiar_pokemones`
+- 🔹El resultado se guarda en un archivo nuevo con `tp1_guardar_archivo()`.
+- 🔹Se liberan las estructuras auxiliares utilizadas.
+- 🔹Se retorna el nuevo tp creado
 
-**Parámetros:** `<archivo2.csv> <resultado.csv>`
-
-- Obtiene los Pokémon que están presentes en ambos archivos (`tp1_interseccion`).
-- El resultado se guarda en el archivo indicado.
-- Se libera la memoria utilizada.
-
----
-
-#### ➖ diferencia
-
-![image7](img/image7.png)
-
-**Parámetros:** `<archivo2.csv> <resultado.csv>`
-
-- Obtiene los Pokémon que están en el primer archivo pero no en el segundo (`tp1_diferencia`).
-- El resultado se guarda en el archivo de salida indicado.
-- Se liberan las estructuras auxiliares.
+⚠️ Si alguno de los archivos no se puede abrir, está vacío o se produce un error de memoria, la función devuelve `NULL` y se muestra un mensaje de error.
 
 ---
 
 ### 3. Liberación de Memoria
 
-Al finalizar cualquier operación:
-
-- Se libera la memoria asociada a los **nombres** de cada Pokémon.
-- Se libera el **vector dinámico** de pokemones.
-- Se libera la **estructura principal `tp1`**.
+Al finalizar cualquier operación se llama a `tp1_destruir()`:
 
 ```c
-void tp1_destruir(tp1_t *tp1)
-{
-	for (size_t i = 0; i < tp1->cantidad; i++) {
-		free(tp1->pokemones[i].nombre);
-	}
-	free(tp1->pokemones);
-	free(tp1);
-};
+void tp1_destruir(tp1_t *tp1);
 ```
 
-Esto garantiza que no haya fugas de memoria durante la ejecución del programa.
+- 🔹Se libera la memoria asociada a los **nombres** de cada Pokémon.
+- 🔹Se libera cada **Pokemon**
+- 🔹Se libera el **vector dinámico** de direcciones de memoria de pokemones.
+- 🔹Se libera la **estructura principal `tp1_t`**.
+
+_Esto garantiza que no haya fugas de memoria_
 
 ## Estructura del Proyecto
 
-La lógica general del programa se organiza en **tres módulos principales**:
+La lógica general del programa se organiza en **dos módulos principales**:
 
 ---
 
-### 1. `mis_funciones.c` / `mis_funciones.h`
+### 1. `tp1.c` / `tp1.h`
 
-Contiene las funciones desarrolladas por mí, que encapsulan la lógica de manejo de estructuras y operaciones sobre los datos.  
-En el `.h` correspondiente se detalla qué hace cada función, qué parámetros recibe y qué valor retorna.
-
-Estas funciones se apoyan en **memoria dinámica** (`malloc`, `realloc`, `free`) para poder manejar datasets de tamaño variable.
-
----
-
-#### Funciones de Ordenamiento
-
-- **`bubbleSort_pokemones_alfabeticamente_asc_optimizado(tp1_t *tp1)`**  
-  Ordena los Pokémon por nombre en orden ascendente.
-
-- **`bubbleSort_pokemones_alfabeticamente_desc_optimizado(tp1_t *tp1)`**  
-  Ordena los Pokémon por nombre en orden descendente.
-
-- **`bubbleSort_pokemones_id_asc_optimizado(tp1_t *tp1)`**  
-  Ordena los Pokémon por ID en orden ascendente.
-
-- **`bubbleSort_pokemones_id_desc_optimizado(tp1_t *tp1)`**  
-  Ordena los Pokémon por ID en orden descendente.
-
----
-
-#### Funciones de Visualización
-
-- **`mostrar_pokemon(struct pokemon *p)`** → imprime los datos de un Pokémon.
-- **`mostrar_pokemones(tp1_t *tp1)`** → imprime todos los Pokémon de la estructura `tp1_t`.
-
----
-
-#### Funciones de Memoria Dinámica
-
-- **`resize_buffer(char *buffer, size_t *capacidad)`** → duplica el tamaño del buffer dinámico, devuelve NULL en caso de error.
-
-  ![image8](img/image8.png)
-
-- **`creando_maloc(size_t size)`** → asigna memoria de manera segura, devuelve NULL en caso de error.
-
-  ![image9](img/image9.png)
-
----
-
-#### Funciones de Manejo de Archivos
-
-- **`archivo_open(const char *nombre_archivo)`** → abre un archivo para lectura, devuelve NULL en caso de error.
-- **`archivo_crear(const char *nombre_archivo)`** → crea un archivo para escritura, devuelve NULL en caso de error.
-- **`leer_linea(FILE *archivo, size_t *capacidad)`** → lee una línea de un archivo CSV dinámicamente.
-- **`escribiendo_linea(tp1_t *tp1, FILE *archivo)`** → escribe los Pokémon en un archivo CSV.
-
----
-
-#### Funciones de Parseo y Validación
-
-- **`parse_pokemon_validations(char *linea)`** → validaciones de linea.
-- **`switch_pokemon(struct pokemon *p, int campo, const char *buffer)`** → asigna los valores de cada campo a la estructura Pokémon.
-- **`parsear_pokemon(char *linea)`** → convierte una línea CSV en un `struct pokemon`.
-- **`agregar_pokemon(tp1_t *tp1, struct pokemon *pk)`** → agrega un Pokémon al vector dinámico de `tp1_t`.
-
-  ![image10](img/image10.png)
-
-- **`tipo_a_string(enum tipo_pokemon tipo)`** → convierte el tipo de Pokémon a cadena.
-- **`validando_formato_csv(const char *archivo)`** → valida que el archivo tenga extensión `.csv`..
-- **`buscando_duplicados(tp1_t *tp1, struct pokemon *pk)`** → devuelve true si el pokemon ya se encontraba dentro del array dinamico.
-
----
-
-### 2. `tp1.c` / `tp1.h`
-
-Módulo que contiene las funciones provistas en la consigna.  
 Aquí se definen:
 
-- La estructura **`struct pokemon`**.
-- La estructura **`struct tp1`**, que agrupa un vector dinámico de pokemones y su cantidad.
-- Funciones base para inicialización y manejo de estas estructuras.
+- 🔹La estructura **`struct pokemon`**.
+- 🔹El enum **`tipo_pokemon`**.
+- 🔹La estructura **`struct tp1`**
+- 🔹Funciones primarias para inicialización y manejo de estas estructuras.
 
 El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos puedan usar estas funciones.
 
----
+En el informe ya se describieron en detalle varias de estas funciones; las restantes, que también forman parte de la interfa<s>, son:
 
-#### Funciones de Lectura y Escritura de Archivos
+```c
+size_t tp1_cantidad(tp1_t *tp1);
+```
 
-- **`tp1_leer_archivo(const char *nombre)`** → lee un archivo CSV y devuelve un `tp1_t` con los Pokémon cargados.
-- **`tp1_guardar_archivo(tp1_t *tp1, const char *nombre)`** → guarda todos los Pokémon de `tp1_t` en un archivo CSV.
+**📌Esta funcion se encarga de**:
 
----
+- 🔹Retornar 0 si no se le pasa ningun **`tp1_t`**
+- 🔹Retornar la **cantidad de pokemones** en la estructura
 
-#### Funciones de Conteo
+```c
+tp1_t *tp1_guardar_archivo(tp1_t *tp1, const char *nombre);
+```
 
-- **`tp1_cantidad(tp1_t *tp1)`** → devuelve la cantidad de Pokémon almacenados en `tp1_t`.
+**📌Esta funcion se encarga de**:
 
----
+- 🔹📝Inicializar un nuervo archivo
+- 🔹🐾Escribir los pokemones dentro de ese archivo en formato csv
 
-#### Funciones de Conjuntos
+⚠️ Si alguno de los archivos no se puede abrir, está vacío o se produce un error de memoria, la función devuelve `NULL`
 
-- **`tp1_union(tp1_t *un_tp, tp1_t otro_tp)`** → combina dos colecciones de Pokémon eliminando duplicados.
+```c
+size_t tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *),
+			    void *extra);
+```
 
-  ![image11](img/image11.png)
+**📌Esta funcion**:
 
-- **`tp1_interseccion(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon comunes a ambos conjuntos.
-
-  ![image12](img/image12.png)
-
-- **`tp1_diferencia(tp1_t *un_tp, tp1_t otro_tp)`** → devuelve los Pokémon que están en el primer conjunto pero no en el segundo.
-
-  ![image13](img/image13.png)
-
----
-
-#### Funciones de Búsqueda
-
-- **`tp1_buscar_nombre(tp1_t *tp, const char *nombre)`** → busca un Pokémon por nombre usando búsqueda binaria (ordenando previamente).
-- **`tp1_buscar_id(tp1_t *tp, int id)`** → busca un Pokémon por ID usando búsqueda binaria (ordenando previamente).
-
----
-
-#### Función de Iteración
-
-- **`tp1_con_cada_pokemon(tp1_t *un_tp, bool (*f)(struct pokemon *, void *), void *extra)`**  
-  Aplica una función `f` a cada Pokémon del conjunto, hasta que `f` retorne `false`. Devuelve la cantidad de iteraciones realizadas.
+- 🔹🔁 Es un iterador interno que recorre cada elemento de la estructura
+- 🔹✅ Aplica la función pasada como segundo parámetro
+- 🔹⛔ Cuando la función devuelve false, se detiene la iteración
+- 🔹📊 Retorna la cantidad de pokemones a los cuales se aplicó la función
+- 🔹🎯 El último parámetro (extra) permite indicar un comportamiento particular
 
 ---
 
-#### Función de Liberacion de memoria
-
-- **`tp1_destruir`**  
-  Libera toda la memoria asociada al tp1.
-
----
-
-Estas funciones dependen de las utilidades definidas en `mis_funciones.c`
-
----
-
-### 3. `main.c` / `funciones_main.h`
+### 2. `main.c`
 
 Es el **punto de entrada del programa**.  
 Se encarga de:
 
-- Validar los parámetros pasados por línea de comando.
-- Mostrar el mensaje inicial si la ejecución no respeta el formato.
-- Llamar a las funciones correspondientes según la operación pedida (`buscar`, `mostrar`, `union`, `interseccion`,`diferencia`).
+- 🔹Validar los parámetros pasados por línea de comando.
+- 🔹Mostrar el mensaje inicial si la ejecución no respeta el formato.
+- 🔹Llamar a las funciones correspondientes según la operación pedida (`buscar`, `mostrar`, `union`, `interseccion`,`diferencia`).
+
+## Funciones Interesantes a mencionar
+
+- **`resize_buffer(char *buffer, size_t *capacidad)`** → duplica el tamaño del buffer dinámico, devuelve NULL en caso de error.
+
+  ![image6](img/image6.png)
 
 ## Tests Unitarios
 
-Esta sección describe cómo se verifican todas las funciones del proyecto mediante pruebas unitarias.
+Esta sección describe cómo se verifican todas las funciones primitivas del proyecto mediante pruebas unitarias y de estrés.
 
 ### Objetivo
 
-- Comprobar que cada función del proyecto se ejecute correctamente en distintos escenarios.
-- Asegurar que las operaciones sobre las estructuras dinámicas (`tp1_t` y `struct pokemon`) se realicen sin errores de memoria.
-- Validar la correcta lectura y escritura de archivos CSV.
-- Confirmar que las funciones de búsqueda, ordenamiento y operaciones de conjuntos (unión, intersección, diferencia) devuelvan los resultados esperados.
+- 🔹Comprobar que cada función del proyecto se ejecute correctamente en distintos escenarios.
+- 🔹Asegurar que las operaciones sobre las estructuras dinámicas se realicen sin errores de memoria.
+- 🔹Validar la correcta lectura y escritura de archivos CSV.
+- 🔹Confirmar que las funciones de búsqueda, ordenamiento y operaciones de conjuntos (unión, intersección, diferencia) devuelvan los resultados esperados.
+- 🔹Asegurarse el buen funcionamiento en casos demandantes
 
 ### Cobertura de pruebas
 
-Se realizan **76 pruebas unitarias** que incluyen:
+Se realizan **48 pruebas unitarias** que incluyen:
 
-- **Lectura de archivos CSV**: validar parseo correcto de líneas y manejo de errores.
-- **Ordenamiento de Pokémon**: ascendente y descendente por nombre e ID.
-- **Operaciones de conjuntos**: unión, intersección y diferencia entre listas de Pokémon.
-- **Búsqueda**: por nombre e ID.
-- **Funciones auxiliares**: `resize_buffer()`, `creando_maloc()`, `tipo_a_string()`, y más.
+- 🔹**Lectura de archivos CSV**: validar parseo correcto de líneas y manejo de errores.
+- 🔹**Pruebas de creacion**: crear los archivos correctamente.
+- 🔹**Operaciones de conjuntos**: unión, intersección y diferencia entre listas de Pokémon.
+- 🔹**Búsqueda**: por nombre e ID.
+- 🔹**Pruebas de iteracion**:
+- 🔹**Pruebas de combinacion de funciones**:
 
 ### Compilación y ejecución de tests
 
 Para compilar los tests:
 
 ```bash
-gcc pruebas_alumno.c src/*.c -o tests
+makefile compilar_t
 ```
 
 Para ejecutar los tests:
@@ -343,18 +277,22 @@ Para ejecutar los tests:
 ./tests
 ```
 
+- Para ejecutar con valgrind:
+
+```bash
+makefile valgrind_t
+```
+
 ## Respuestas a las preguntas teóricas
 
 ### 1. Elección de la estructura
 
-Para implementar la funcionalidad pedida, se eligió la siguiente estructura principal:
+Para implementar la funcionalidad pedida, se eligió una estructura con dos propiedades:
 
-```c
-struct tp1 {
-    struct pokemon *pokemones; // Vector dinámico de Pokémon
-    size_t cantidad;            // Cantidad de Pokémon en el vector
-};
-```
+- 1. Vector dinamico de direcciones de memoria de Pokemones
+- 2. Cantidad de pokemones dentro del vector
+
+![image7](img/image7.png)
 
 ### 2. Diagramas
 
@@ -368,34 +306,21 @@ Hay 2 diagrmas:
 
 - **`tp1_leer_archivo`** → O(n)
 
-  - Se itera línea por línea del archivo CSV, donde n es la cantidad de registros.
-
 - **`tp1_guardar_archivo`** → O(n)
 
-  - Se recorre todo el vector de Pokémon para escribir cada registro.
+- **`tp1_union`** → O(n+m)
 
-- **`tp1_union`** → O(n^2)
+- **`tp1_interseccion`** → O(n+m)
 
-  - Para cada Pokémon del segundo vector se compara con los del primero para evitar duplicados, siendo n y m las cantidades de cada vector.
+- **`tp1_diferencia`** → O(n+m)
 
-- **`tp1_interseccion`** → O(n^2)
+- **`tp1_buscar_nombre`** → O(n)
 
-  - Se compara cada Pokémon del vector más pequeño con todos los del más grande.
-
-- **`tp1_diferencia`** → O(n^2)
-
-  - Para cada Pokémon del primer vector se busca coincidencia en el segundo vector.
-
-- **`tp1_buscar_nombre`** → O(n log n)
-
-  - Primero se ordena el vector alfabéticamente (O(n log n)) y luego se realiza búsqueda binaria (O(log n)).
-
-- **`tp1_buscar_id`** → O(n log n)
-
-  - Similar al anterior: ordenar por id + búsqueda binaria.
+- **`tp1_buscar_id`** → O(n)
 
 - **`tp1_con_cada_pokemon`** → O(n)
-  - Se recorre todo el vector hasta que la función callback retorne false.
+
+- **`tp1_destruir`** → O(n)
 
 **Nota:** n corresponde a la cantidad de Pokémon en `tp1->cantidad`.
 
@@ -410,3 +335,7 @@ Las dificultades principales fueron:
 
 - Asegurar que todas las validaciones de parámetros funcionen correctamente antes de ejecutar la operación.
 - Manejar memoria dinámica de manera segura y consistente.
+- Me complique mucho trayendo complejidad inecesaria
+- Optimizacion de funciones ineficientes (En particular la de union)
+- Comprender correctamente el encapsulamiento
+- No tener Leaks de memoria
