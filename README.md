@@ -188,7 +188,7 @@ Aquí se definen:
 
 El archivo `tp1.h` actúa como **interfaz pública** para que otros módulos puedan usar estas funciones.
 
-En el informe ya se describieron en detalle varias de estas funciones; las restantes, que también forman parte de la interfa<s>, son:
+En el informe ya se describieron en detalle varias de estas funciones; las restantes, que también forman parte de la interfaz, son:
 
 ```c
 size_t tp1_cantidad(tp1_t *tp1);
